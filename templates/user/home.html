@@ -1,0 +1,21 @@
+{% extends "../main.html" %}
+
+{% block title %}Home{% end %}
+
+{% block content %}
+<div class="container">
+    <h1>Welcome</h1>
+    <br />
+    <div class="well">
+        You are now authenticated as {{ user.name }}
+        <br />
+        <br />
+        You have the following permissions:
+        {% if 0 < len(user.permission_names) %}
+            <pre>{% for permission in user.permission_names %}{{ permission }}{% end %}</pre>
+        {% else %}
+            <pre>No permissions</pre>
+        {% end %}
+    </div>
+</div>
+{% end %}
