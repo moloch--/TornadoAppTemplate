@@ -14,10 +14,11 @@ Basic outline of a Tornado web app
 - Bootstrap v3
 - JQuery v1.10.2 
 
-# How to user
+# How to use
 
 - Clone repo
 - Install dependancies __setup/depends.sh__
+- Write your code!
 - Create/init the database using __./app.py -c__
 - Start the server __./app.py -s__
 
