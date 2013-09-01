@@ -6,6 +6,7 @@ Basic outline of a Tornado web app
 
 - Users
 - User based Permissions
+- Configurable support for SSL/TLS
 - Authentication
 - SQLAlchemy w/support for SQLite/MySQL/Postgres
 - Sessions using Memcached
