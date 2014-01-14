@@ -17,10 +17,11 @@
     limitations under the License.
 '''
 
-from models import User
-from models.User import ADMIN_PERMISSION
+
+from models.User import User, ADMIN_PERMISSION
 from handlers.BaseHandlers import BaseHandler
 from libs.SecurityHelpers import *
+
 
 class UserHomeHandler(BaseHandler):
 

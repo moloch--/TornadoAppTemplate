@@ -29,7 +29,8 @@ import logging
 import pylibmc
 import traceback
 
-from models import DBSession, User
+from models import DBSession
+from models.User import User
 from libs.SecurityHelpers import *
 from libs.ConfigManager import ConfigManager
 from libs.Sessions import MemcachedSession
