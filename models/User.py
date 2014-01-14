@@ -29,8 +29,8 @@ from os import urandom
 from pbkdf2 import PBKDF2
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import synonym, relationship, backref
-from sqlalchemy.types import Unicode, String 
-from models import dbsession, Permission
+from sqlalchemy.types import Unicode, String
+from models import DBSession, Permission
 from models.BaseModels import DatabaseObject
 
 
@@ -44,21 +44,24 @@ class User(DatabaseObject):
     ''' User definition '''
 
     name = Column(Unicode(16), unique=True, nullable=False)
+
     _password = Column('password', String(64))
     password = synonym('_password', descriptor=property(
         lambda self: self._password,
         lambda self, password: setattr(
                 self, '_password', self.__class__._hash_password(password))
-    ))
-    permissions = relationship("Permission", 
-        backref=backref("User", lazy="select"), 
+        )
+    )
+
+    permissions = relationship("Permission",
+        backref=backref("user", lazy="select"),
         cascade="all, delete-orphan"
     )
 
     @classmethod
     def all(cls):
         ''' Returns a list of all objects in the database '''
-        return dbsession.query(cls).all()
+        return DBSession().query(cls).all()
 
     @classmethod
     def all_users(cls):
@@ -68,18 +71,14 @@ class User(DatabaseObject):
         )
 
     @classmethod
-    def by_id(cls, identifier):
+    def by_id(cls, _id):
         ''' Returns a the object with id of identifier '''
-        return dbsession.query(cls).filter_by(
-            id=identifier
-        ).first()
+        return DBSession().query(cls).filter_by(id=_id).first()
 
     @classmethod
-    def by_name(cls, username):
-        ''' Returns a the object with name of username '''
-        return dbsession.query(cls).filter_by(
-            name=unicode(username)
-        ).first()
+    def by_name(cls, _name):
+        ''' Returns a the object with name of _name '''
+        return DBSession().query(cls).filter_by(name=unicode(_name)).first()
 
     @classmethod
     def _hash_password(cls, password):

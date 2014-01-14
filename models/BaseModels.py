@@ -41,6 +41,7 @@ class _DatabaseObject(object):
                    lambda letter: "_" + letter.group(0).lower(), name[1:]
             )
         )
+
     id = Column(Integer, primary_key=True)  # lint:ok
     created = Column(DateTime, default=datetime.now)
 

@@ -19,30 +19,12 @@
 
 
 from sqlalchemy import create_engine
-from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.types import Integer
 from sqlalchemy.orm import sessionmaker
-from models.BaseModels import DatabaseObject
 from libs.ConfigManager import ConfigManager
 
-config = ConfigManager.instance()
-
 ### Setup the database session
-engine = create_engine(config.db_connection)
+_config = ConfigManager.instance()
+engine = create_engine(_config.db_connection)
 setattr(engine, 'echo', False)
-Session = sessionmaker(bind=engine, autocommit=True)
-dbsession = Session(autoflush=True)
-metadata = DatabaseObject.metadata
-
-
-# Import models
-from models.Permission import Permission
-from models.User import User
-
-
-def _create_tables(sqla_engine, sqla_metadata):
-    ''' Create all the tables '''
-    setattr(sqla_engine, 'echo', True) 
-    sqla_metadata.create_all(sqla_engine)
-
-create_tables = lambda: _create_tables(engine, metadata)
+_Session = sessionmaker(bind=engine)
+DBSession = lambda: _Session(autoflush=True)

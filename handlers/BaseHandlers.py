@@ -19,7 +19,7 @@ Created on Mar 15, 2012
     limitations under the License.
 ----------------------------------------------------------------------------
 
-This file contains the base handlers, all other handlers should inherit 
+This file contains the base handlers, all other handlers should inherit
 from these base classes.
 
 '''
@@ -29,16 +29,32 @@ import logging
 import pylibmc
 import traceback
 
-from models import User
+from models import DBSession, User
 from libs.SecurityHelpers import *
 from libs.ConfigManager import ConfigManager
 from libs.Sessions import MemcachedSession
 from tornado.web import RequestHandler
 from tornado.websocket import WebSocketHandler
+from sqlalchemy.orm import sessionmaker
 
 
 class BaseHandler(RequestHandler):
     ''' User handlers extend this class '''
+
+    default_csp = "default-src 'self';" + \
+        "script-src 'self';" + \
+        "style-src 'self';" + \
+        "font-src 'self';" + \
+        "img-src 'self';"
+
+    _dbsession = None
+
+    @property
+    def dbsession():
+        ''' Lazily create a dbsession '''
+        if self._dbsession is None:
+            self._dbsession = DBSession()
+        return self._dbsession
 
     def initialize(self):
         ''' Setup sessions, etc '''
@@ -49,18 +65,11 @@ class BaseHandler(RequestHandler):
             self.session = self._create_session(session_id)
             self.session.refresh()
 
-    def get_current_user(self):
-        ''' Get current user object from database '''
-        if self.session is not None:
-            return User.by_id(self.session['user_id'])
-        return None
-
     def start_session(self):
         ''' Starts a new session '''
         self.session = self._create_session()
         self.set_secure_cookie('session_id',
             self.session.session_id,
-            expires_days=1,
             expires=self.session.expires,
             path='/',
             HttpOnly=True,
@@ -92,10 +101,12 @@ class BaseHandler(RequestHandler):
         return new_session
 
     def set_default_headers(self):
-        ''' Set clickjacking/xss headers '''
+        ''' Set security HTTP headers '''
         self.set_header("Server", "'; DROP TABLE servertypes; --")
         self.add_header("X-Frame-Options", "DENY")
         self.add_header("X-XSS-Protection", "1; mode=block")
+        self.add_header("X-Content-Security-Policy", self.default_csp)
+        self.add_header("Content-Security-Policy", self.default_csp)
 
     def write_error(self, status_code, **kwargs):
         ''' Write our custom error pages '''
@@ -112,6 +123,12 @@ class BaseHandler(RequestHandler):
         else:
             # If debug mode is enabled, just call Tornado's write_error()
             super(BaseHandler, self).write_error(status_code, **kwargs)
+
+    def get_current_user(self):
+        ''' Get current user object from database '''
+        if self.session is not None:
+            return User.by_id(self.session['user_id'])
+        return None
 
     def get(self, *args, **kwargs):
         ''' Placeholder, incase child class does not impl this method '''
@@ -149,6 +166,15 @@ class BaseHandler(RequestHandler):
 class BaseWebSocketHandler(WebSocketHandler):
     ''' Handles websocket connections '''
 
+    _dbsession = None
+
+    @property
+    def dbsession():
+        ''' Lazily create a dbsession '''
+        if self._dbsession is None:
+            self._dbsession = DBSession()
+        return self._dbsession
+
     def initialize(self):
         ''' Setup sessions, etc '''
         self.session = None
@@ -156,7 +182,7 @@ class BaseWebSocketHandler(WebSocketHandler):
         session_id = self.get_secure_cookie('session_id')
         if session_id is not None:
             self.conn = pylibmc.Client(
-                [self.config.memcached], 
+                [self.config.memcached],
                 binary=True
             )
             self.conn.behaviors['no_block'] = 1  # async I/O
@@ -183,7 +209,7 @@ class BaseWebSocketHandler(WebSocketHandler):
         ''' Get current user object from database '''
         if self.session is not None:
             try:
-                return User.by_handle(self.session['handle'])
+                return User.by_id(self.session['user_id'])
             except KeyError:
                 logging.exception(
                     "Malformed session: %r" % self.session

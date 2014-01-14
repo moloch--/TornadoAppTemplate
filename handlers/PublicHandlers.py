@@ -45,15 +45,15 @@ class LoginHandler(BaseHandler):
             self.login_failure()
 
     def login_failure(self):
-        self.render('public/login.html', 
+        self.render('public/login.html',
             errors=["Invalid username and/or password."])
 
     def login_success(self, user):
         self.start_session()
         self.session['user_id'] = user.id
         if user.has_permission(ADMIN_PERMISSION):
-            self.session['menu'] = 'admin'
+            self.session['user_menu'] = 'admin'
         else:
-            self.session['menu'] = 'user'
-        self.session['username'] = user.name
+            self.session['user_menu'] = 'user'
+        self.session['user_name'] = user.name
         self.session.save()

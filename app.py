@@ -43,9 +43,8 @@ def serve():
 
 def create():
     ''' Creates/bootstraps the database '''
-    from models import create_tables
     print(INFO+'%s : Creating the database ...' % current_time())
-    create_tables()
+    import setup.create_database
     print(INFO+'%s : Bootstrapping the database ...' % current_time())
     import setup.bootstrap
 
