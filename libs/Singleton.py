@@ -3,7 +3,7 @@
 @author: moloch
 
     Copyright 2013
-    
+
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -17,10 +17,16 @@
     limitations under the License.
 '''
 
+
+from threading import Lock
+
+
 class Singleton(object):
+    ''' Thread safe singleton '''
 
     def __init__(self, decorated):
         self._decorated = decorated
+        self._instance_lock = Lock()
 
     def instance(self):
         '''
@@ -28,11 +34,12 @@ class Singleton(object):
         new instance of the decorated class and calls its `__init__` method.
         On all subsequent calls, the already created instance is returned.
         '''
-        try:
-            return self._instance
-        except AttributeError:
-            self._instance = self._decorated()
-            return self._instance
+        if not hasattr(self, "_instance"):
+            with self._instance_lock:
+                if not hasattr(self, "_instance"):
+                    self._instance = self._decorated()
+        return self._instance
+
 
     def __call__(self):
         raise TypeError(

@@ -22,9 +22,9 @@ import getpass
 
 from libs.ConsoleColors import *
 from libs.ConfigManager import ConfigManager
-from models import DBSession
-from models.Permission import Permission
-from models.User import User, ADMIN_PERMISSION
+from models import dbsession
+from models.Permission import Permission, ADMIN_PERMISSION
+from models.User import User
 
 # Fills the database with some startup data.
 config = ConfigManager.instance()
@@ -47,7 +47,6 @@ else:
         print(WARN+'Error: Passwords did not match, or were less than 12 chars')
         os._exit(1)
 
-dbsession = DBSession()
 user = User(name=admin_user, password=password)
 dbsession.add(user)
 dbsession.flush()
@@ -56,12 +55,3 @@ user.permissions.append(admin_permission)
 dbsession.add(admin_permission)
 dbsession.add(user)
 dbsession.commit()
-
-# Display Details
-if config.bootstrap == 'developement':
-    environ = bold + R + "Developement boot strap" + W
-    details = ", default admin password is '%s'." % password
-else:
-    environ = bold + "Production boot strap" + W
-    details = '.'
-print INFO + '%s completed successfully%s' % (environ, details)

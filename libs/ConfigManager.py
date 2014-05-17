@@ -125,7 +125,7 @@ class ConfigManager(object):
         if _domain.lower() == 'auto':
             try:
                 _domain = socket.gethostbyname(socket.gethostname())
-                # On some Linux systems the hostname resolves to ~127.0.0.1 
+                # On some Linux systems the hostname resolves to ~127.0.0.1
                 # per /etc/hosts, so fallback and try to get the fqdn if we can.
                 if _domain.startswith('127.'):
                     _domain = socket.gethostbyname(socket.getfqdn())
@@ -153,13 +153,9 @@ class ConfigManager(object):
         return "%s:%d" % (host, port)
 
     @property
-    def session_age(self):
+    def session_duration(self):
         ''' Max session age in seconds '''
         return abs(self.config.getint("Sessions", 'max_age'))
-    
-    @property
-    def session_regeneration_interval(self):
-        return abs(self.config.getint("Sessions", 'regeneration_interval'))
 
     @property
     def admin_ips(self):
@@ -201,23 +197,21 @@ class ConfigManager(object):
             os._exit(1)
         return key
 
-    @property 
+    @property
     def db_connection(self):
         ''' Construct the database connection string '''
-        db = self.config.get("Database", 'dialect').lower().strip()
-        if db == 'sqlite':
-            db_conn = self._sqlite()
-        elif db == 'postgresql':
-            db_conn = self._postgresql()
-        elif db == 'mysql':
-            db_conn = self._mysql()
-        else:
-            raise ValueError("Database dialect not supported")
-        self._test_connection(db_conn)
-        return db_conn
+        dialect = self.config.get("Database", 'dialect').lower().strip()
+        dialects = {
+            'sqlite': self._sqlite,
+            'postgresql': self._postgresql,
+            'mysql': self._mysql,
+        }
+        _db = dialects.get(dialect, self._sqlite)()
+        self._test_connection(_db)
+        return _db
 
     def _postgresql(self):
-        ''' 
+        '''
         Configure to use postgresql, there is not built-in support for postgresql
         so make sure we can import the 3rd party python lib 'pypostgresql'
         '''
@@ -236,8 +230,8 @@ class ConfigManager(object):
         ''' SQLite connection string, always save db file to cwd, or in-memory '''
         logging.debug("Configured to use SQLite for a database")
         db_name = os.path.basename(self.config.get("Database", 'name'))
-        if 0 == len(db_name):
-            db_name = 'rtb'
+        if not len(db_name):
+            db_name = 'app'
         return ('sqlite:///%s.db' % db_name) if db_name != ':memory:' else 'sqlite://'
 
     def _mysql(self):
@@ -257,7 +251,7 @@ class ConfigManager(object):
         except:
             if self.debug:
                 logging.exception("Database connection failed")
-            logging.critical("Failed to connect to database, check settings")
+            logging.critical("Failed to connect to database, check .cfg")
             os._exit(1)
 
     def _db_credentials(self):

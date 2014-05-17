@@ -18,7 +18,6 @@
 '''
 
 
-from models.User import User, ADMIN_PERMISSION
 from handlers.BaseHandlers import BaseHandler
 from libs.SecurityHelpers import *
 

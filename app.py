@@ -43,10 +43,21 @@ def serve():
 
 def create():
     ''' Creates/bootstraps the database '''
+    from libs.ConfigManager import ConfigManager  # Sets up logging
     print(INFO+'%s : Creating the database ...' % current_time())
-    import setup.create_database
-    print(INFO+'%s : Bootstrapping the database ...' % current_time())
+    from setup.create_database import create_tables, engine, metadata
+    is_devel = ConfigManager.instance().bootstrap.startswith('devel')
+    create_tables(engine, metadata, is_devel)
+    print(INFO + '%s : Bootstrapping the database ...' % current_time())
     import setup.bootstrap
+    # Display Details
+    if is_devel:
+        environ = bold + R + "Developement boot strap" + W
+        details = ", admin password is 'nimda123'."
+    else:
+        environ = bold + "Production boot strap" + W
+        details = '.'
+    print(INFO + '%s completed successfully%s' % (environ, details))
 
 
 def main(args):

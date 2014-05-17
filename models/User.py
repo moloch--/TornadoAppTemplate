@@ -30,29 +30,20 @@ from pbkdf2 import PBKDF2
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import synonym, relationship, backref
 from sqlalchemy.types import Unicode, String
-from models import DBSession, Permission
+from models import dbsession, Permission
 from models.BaseModels import DatabaseObject
 
 
 
 ### Constants
-ADMIN_PERMISSION = u'admin'
 ITERATE = 0xbad
 
 
 class User(DatabaseObject):
     ''' User definition '''
 
-    name = Column(Unicode(16), unique=True, nullable=False)
-
+    _name = Column(Unicode(16), unique=True, nullable=False)
     _password = Column('password', String(64))
-    password = synonym('_password', descriptor=property(
-        lambda self: self._password,
-        lambda self, password: setattr(
-                self, '_password', self.__class__._hash_password(password))
-        )
-    )
-
     permissions = relationship("Permission",
         backref=backref("user", lazy="select"),
         cascade="all, delete-orphan"
@@ -61,7 +52,7 @@ class User(DatabaseObject):
     @classmethod
     def all(cls):
         ''' Returns a list of all objects in the database '''
-        return DBSession().query(cls).all()
+        return dbsession.query(cls).all()
 
     @classmethod
     def all_users(cls):
@@ -73,16 +64,32 @@ class User(DatabaseObject):
     @classmethod
     def by_id(cls, _id):
         ''' Returns a the object with id of identifier '''
-        return DBSession().query(cls).filter_by(id=_id).first()
+        return dbsession.query(cls).filter_by(id=_id).first()
 
     @classmethod
-    def by_name(cls, _name):
-        ''' Returns a the object with name of _name '''
-        return DBSession().query(cls).filter_by(name=unicode(_name)).first()
+    def by_name(cls, name):
+        ''' Returns a the object with name of `name` '''
+        return dbsession.query(cls).filter_by(_name=unicode(name)).first()
 
     @classmethod
     def _hash_password(cls, password):
         return PBKDF2.crypt(password, iterations=ITERATE)
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = unicode(value)
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, value):
+        self._password = self._hash_password(value)
 
     @property
     def permission_names(self):

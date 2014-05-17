@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 '''
+Created on Sep 12, 2012
+
 @author: moloch
 
-    Copyright 2013
+    Copyright 2012 Root the Box
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,10 +23,27 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from libs.ConfigManager import ConfigManager
+from contextlib import contextmanager
+
 
 ### Setup the database session
 _config = ConfigManager.instance()
 engine = create_engine(_config.db_connection)
 setattr(engine, 'echo', False)
 _Session = sessionmaker(bind=engine)
-DBSession = lambda: _Session(autoflush=True)
+StartSession = lambda: _Session(autoflush=True)
+
+dbsession = StartSession()
+
+@contextmanager
+def cxt_dbsession():
+    ''' Provide a transactional scope around a series of operations. '''
+    session = StartSession()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()

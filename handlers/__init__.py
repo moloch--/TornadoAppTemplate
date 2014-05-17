@@ -2,7 +2,7 @@
 '''
 @author: moloch
 
-    Copyright 2013 
+    Copyright 2013
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -39,25 +39,25 @@ config = ConfigManager.instance()
 app = Application([
 
     # Static Handlers - Serves static CSS, JS and images
-    (r'/static/(.*\.(css|js|png|jpg|jpeg|svg|ttf))', 
+    (r'/static/(.*\.(css|js|png|jpg|jpeg|svg|ttf))',
         StaticFileHandler, {'path': 'static/'}),
 
     # User Handlers -
     (r'/user', UserHomeHandler),
 
-    # Admin Handlers - 
+    # Admin Handlers -
 
     # Error Handlers -
     (r'/403', ForbiddenHandler),
 
-    # Public Handlers - 
+    # Public Handlers -
     (r'/login', LoginHandler),
     (r'/', LoginHandler),
 
     # Catch all 404 page
     (r'(.*)', NotFoundHandler),
 
-    ],
+],
 
     # Randomly generated secret key
     cookie_secret=urandom(32).encode('hex'),
@@ -90,19 +90,14 @@ def start_server():
     ''' Main entry point for the application '''
     sockets = netutil.bind_sockets(config.listen_port)
     if config.use_ssl:
-        server = HTTPServer(
-            app, 
+        server = HTTPServer(app,
             ssl_options={
                 "certfile": config.certfile,
                 "keyfile": config.keyfile,
-            }, 
-            xheaders=config.x_headers
-        )
+            },
+            xheaders=config.x_headers)
     else:
-        server = HTTPServer(
-            app, 
-            xheaders=config.x_headers
-        )
+        server = HTTPServer(app, xheaders=config.x_headers)
     server.add_sockets(sockets)
     io_loop = IOLoop.instance()
     try:

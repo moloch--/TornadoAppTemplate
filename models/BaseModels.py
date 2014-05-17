@@ -21,11 +21,15 @@ Created on Mar 12, 2012
 
 import re
 
+from uuid import uuid4
 from datetime import datetime
 from sqlalchemy import Column
-from sqlalchemy.types import DateTime, Integer
+from sqlalchemy.types import DateTime, Integer, String
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.declarative import declarative_base
+
+
+generate_uuid = lambda: str(uuid4())
 
 
 class _DatabaseObject(object):
@@ -42,7 +46,8 @@ class _DatabaseObject(object):
             )
         )
 
-    id = Column(Integer, primary_key=True)  # lint:ok
+    id = Column(Integer, unique=True, primary_key=True)  # lint:ok
+    uuid = Column(String(36), unique=True, default=generate_uuid)
     created = Column(DateTime, default=datetime.now)
 
 # Create an instance called "BaseObject"

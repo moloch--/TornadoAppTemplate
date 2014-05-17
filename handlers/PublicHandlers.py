@@ -18,7 +18,8 @@
 '''
 
 
-from models.User import User, ADMIN_PERMISSION
+from models.User import User
+from models.Permission import ADMIN_PERMISSION
 from handlers.BaseHandlers import BaseHandler
 
 
@@ -38,21 +39,20 @@ class LoginHandler(BaseHandler):
                 self.login_success(user)
                 self.redirect('/user')
             else:
-                self._auth_failure()
+                self.login_failure()
         else:
             # Prevent user enumeration via timing attack
             User._hash_password(password)
             self.login_failure()
 
     def login_failure(self):
-        self.render('public/login.html',
-            errors=["Invalid username and/or password."])
+        self.render('public/login.html', errors=["Invalid username and/or password."])
 
     def login_success(self, user):
         self.start_session()
         self.session['user_id'] = user.id
         if user.has_permission(ADMIN_PERMISSION):
-            self.session['user_menu'] = 'admin'
+            self.session['user_menu'] = ADMIN_PERMISSION
         else:
             self.session['user_menu'] = 'user'
         self.session['user_name'] = user.name

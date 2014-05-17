@@ -17,8 +17,6 @@
     limitations under the License.
 '''
 
-from models import User
-from models.User import ADMIN_PERMISSION
 from handlers.BaseHandlers import BaseHandler
 
 
