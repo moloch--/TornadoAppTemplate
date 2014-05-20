@@ -23,6 +23,16 @@ import functools
 from models.User import User
 
 
+def csp(src, policy):
+    ''' Decorator for easy CSP management '''
+
+    def func(method):
+        @functools.wraps(method)
+        def wrapper(self, *args, **kwargs):
+            self.add_content_policy(src, policy)
+        return wrapper
+    return func
+
 def authenticated(method):
     ''' Checks to see if a user has been authenticated '''
 
