@@ -1,0 +1,144 @@
+<div id="add-user-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    <i class="fa fa-fw fa-user-plus"></i>
+                    Add New User
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div id="add-user-alerts"></div>
+                <form id="add-user-form">
+                    <div class="form-group">
+                        <label for="user-name">Name</label>
+                        <input type="text" class="form-control" id="add-user-name" placeholder="Username">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-email-address">Email Address</label>
+                        <input type="email" class="form-control" id="add-user-email-address" placeholder="Email Address">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-password">Password</label>
+                        <input type="password" class="form-control" id="add-user-password" placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-confirm-password">Confirm Password</label>
+                        <input type="password" class="form-control" id="add-user-confirm-password" placeholder="Confirm Password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Close
+                </button>
+                <button id="add-user-save" type="button" class="btn btn-primary">
+                    <i class="fa fa-fw fa-user-plus"></i>
+                    Add New User
+                </button>
+            </div><!-- /.model-footer -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="lock-user-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    <i class="fa fa-fw fa-user-times"></i>
+                    Lock User Account
+                </h4>
+            </div>
+            <div class="modal-body text-center">
+                Are you sure you want to <strong>lock</strong> this user account?
+                <input id="lock-user-id" type="hidden" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Close
+                </button>
+                <button id="lock-user-save" type="button" class="btn btn-danger">
+                    <i class="fa fa-fw fa-user-times"></i>
+                    Lock Account
+                </button>
+            </div><!-- /.model-footer -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<div id="unlock-user-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    <i class="fa fa-fw fa-user"></i>
+                    Unlock User Account
+                </h4>
+            </div>
+            <div class="modal-body text-center">
+                Are you sure you want to <strong>unlock</strong> this user account?
+                <input id="unlock-user-id" type="hidden" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Close
+                </button>
+                <button id="unlock-user-save" type="button" class="btn btn-success">
+                    <i class="fa fa-fw fa-unlock"></i>
+                    Unlock Account
+                </button>
+            </div><!-- /.model-footer -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="container">
+    <div class="page-header">
+        <h1>
+            <i class="fa fa-fw fa-group"></i>
+            Manage Users
+        </h1>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button class="btn btn-success" type="button" data-toggle="modal" data-target="#add-user-modal">
+                <i class="fa fa-fw fa-user-plus"></i>
+                Add New User
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div id="alerts" class="col-md-12"></div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Created</th>
+                        <th>Last Login</th>
+                        <th>Name</th>
+                        <th>Email Address</th>
+                        <th>2FA Enabled</th>
+                        <th>Admin Permission</th>
+                        <th><!-- Buttons --></th>
+                    </tr>
+                </thead>
+                <tbody id="users-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

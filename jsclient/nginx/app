@@ -1,0 +1,67 @@
+#
+# > App
+#
+
+server {
+
+    listen 80 default_server;
+
+    server_name foo.bar;
+    server_tokens off;
+
+    # API requests
+    location ^~ /api/ {
+
+        # Add security headers
+        add_header X-Frame-Options DENY;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+
+        # Upstream to API
+        proxy_pass_header Server;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_pass http://app_api;
+    }
+
+    ## DEBUG ONLY - Serves unminified .js files
+    location ^~ /app/ {
+
+        # Add security headers
+        add_header X-Frame-Options DENY;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+
+        # Serve static unminified /app/ directory
+        autoindex off;
+        root /var/www;
+    }
+    ## END DEBUG ONLY
+
+    # Static HTML/CSS/JS content
+    location / {
+
+        # Add security headers
+        add_header X-Frame-Options DENY;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+        add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; font-src 'self'; img-src 'self' data:; frame-ancestors 'none'";
+
+        # Serve static html/index
+        autoindex off;
+        root /var/www/dist;
+    }
+}
+
+
+#
+# > Upstream API process
+#
+upstream app_api {
+
+    server api_1:8888;
+
+}

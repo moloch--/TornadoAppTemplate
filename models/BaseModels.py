@@ -1,54 +1,73 @@
 # -*- coding: utf-8 -*-
-'''
-Created on Mar 12, 2012
-
+"""
 @author: moloch
+Copyright 2016
+"""
+# pylint: disable=C0103
 
-    Copyright 2012
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-'''
 
 import re
-
-from uuid import uuid4
+import uuid
+from base64 import urlsafe_b64encode
 from datetime import datetime
-from sqlalchemy import Column
-from sqlalchemy.types import DateTime, Integer, String
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.declarative import declarative_base
 
+from sqlalchemy import Column, event
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.types import DateTime
 
-generate_uuid = lambda: str(uuid4())
+from libs.DatabaseDatatypes import UUIDType
+from models import DBSession
 
 
 class _DatabaseObject(object):
-    ''' All game objects inherit from this object '''
+
+    """
+    All database objects inherit from this object, it automatically
+    creates a primary key, a `created` datetime and the sets the tablename
+    by converting the classname to snake case.
+    """
+
+    _id = Column(UUIDType(), primary_key=True, default=uuid.uuid4)
+    created = Column(DateTime, default=datetime.utcnow)
+    updated = Column(DateTime, default=datetime.utcnow)
 
     @declared_attr
     def __tablename__(self):
-        ''' Converts name from camel case to snake case '''
+        """ Converts name from camel case to snake case """
         name = self.__name__
         return (
             name[0].lower() +
             re.sub(r'([A-Z])',
-                   lambda letter: "_" + letter.group(0).lower(), name[1:]
-            )
-        )
+                   lambda letter: "_" + letter.group(0).lower(), name[1:]))
 
-    id = Column(Integer, unique=True, primary_key=True)  # lint:ok
-    uuid = Column(String(36), unique=True, default=generate_uuid)
-    created = Column(DateTime, default=datetime.now)
+    @property
+    def id(self):
+        """ Return the urlsafe_b64encode version of the UUID primary key """
+        if self._id is None:
+            self._id = uuid.uuid4()  # Coercion occurs on commit()
+            return urlsafe_b64encode(self._id.bytes)
+        else:
+            return self._id
 
-# Create an instance called "BaseObject"
+    @classmethod
+    def all(cls):
+        """ Returns a list of all objects in the database """
+        return DBSession().query(cls).all()
+
+    @classmethod
+    def by_id(cls, guid):
+        """
+        Returns a the object with id of guid, can accept a string of UUID class
+        """
+        return DBSession().query(cls).filter_by(_id=guid).first()
+
+
+
+# Create a usable class with SQLAlchemy's declarative_base
 DatabaseObject = declarative_base(cls=_DatabaseObject)
+
+# Place a hook for `updated' attribute
+# pylint: disable=W0613
+@event.listens_for(DatabaseObject, "before_update", propagate=True)
+def timestamp_before_update(mapper, connection, target):
+    target.updated = datetime.utcnow()

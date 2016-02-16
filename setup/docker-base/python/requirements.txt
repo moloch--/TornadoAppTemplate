@@ -1,0 +1,11 @@
+py-bcrypt
+psycopg2
+sqlalchemy
+sqlalchemy-utils
+tornado
+cryptography
+jsonschema
+alembic
+furl
+qrcode
+Pillow

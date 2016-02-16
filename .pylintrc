@@ -1,0 +1,22 @@
+[MASTER]
+
+# Ignore directories that don't have Python code
+ignore=.git jsclient/
+
+
+###############################################################################
+#   F0401 = Unable to import module
+#   C0325 = Unnecessary parens
+#   C0111 = Missing doc-string
+#   E1101 = Use of non-existent member
+#   E1002 = Use of super() on an old-style class
+#   E0611 = Import errors
+#   E501  = Line too long (79+ chars)
+#   W0232 = Class has no __init__ method
+#   W0223 = Method is in abstract in class but is not overridden
+#   W0141 = Use of built-in filter()
+#   R0903 = Too few public methods
+#   R0201 = Method could be a function
+#   R0913 = Too many arguments
+
+disable=F0401,C0325,C0111,E1101,E1002,E0611,E501,W0232,W0223,W0201,W0141,R0903,R0201,R0913

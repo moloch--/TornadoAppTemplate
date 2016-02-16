@@ -1,0 +1,53 @@
+<td>
+    {{#if this.created}}
+        {{timestamp this.created}}
+    {{else}}
+        <i class="fa fa-spinner fa-pulse"></i>
+    {{/if}}
+</td>
+<td>
+    {{#if this.last_login}}
+        {{this.last_login}}
+    {{else}}
+        Never
+    {{/if}}
+</td>
+<td>
+    {{#if this.name}}
+        {{this.name}}
+    {{else}}
+        <i class="fa fa-spinner fa-pulse"></i>
+    {{/if}}
+</td>
+<td>
+    {{#if this.email_address}}
+        {{this.email_address}}
+    {{else}}
+        None
+    {{/if}}
+</td>
+<td>
+    {{#if this.otp_enabled}}
+        <i class="fa fa-fw fa-check-square-o"></i>
+    {{else}}
+        <i class="fa fa-fw fa-square-o"></i>
+    {{/if}}
+</td>
+<td>
+    {{#if this.is_admin}}
+        <i class="fa fa-fw fa-check-square-o"></i>
+    {{else}}
+        <i class="fa fa-fw fa-square-o"></i>
+    {{/if}}
+</td>
+<td>
+    {{#if this.account_locked}}
+        <button id="unlock-user-button" type="button" class="btn btn-success btn-xs" data-user="{{ this.id }}">
+            <i class="fa fa-fw fa-unlock"></i>
+        </button>
+    {{else}}
+        <button id="lock-user-button" type="button" class="btn btn-danger btn-xs" data-user="{{ this.id }}">
+            <i class="fa fa-fw fa-user-times"></i>
+        </button>
+    {{/if}}
+</td>

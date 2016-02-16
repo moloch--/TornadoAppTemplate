@@ -1,10 +1,29 @@
-*.py[co]
+# Backbone templates should be ignored because they're compiled via
+# Handlebars.js, add an ignore for each Backbone component with views
 
-# File uploads and what not
-files/avatars/*
-files/icons/*
-files/shares/*
-files/source_code_market/*
+# JavaScript
+jsclient/bower_components
+jsclient/bower_components/*
+jsclient/node_modules
+jsclient/node_modules/*
+jsclient/management/app/templates.js
+jsclient/ctf/app/templates.js
+jsclient/static/js/*
+jsclient/dist/
+jsclient/dist/*
+
+
+# Python files
+*.py[co]
+files/*
+build
+build/*
+dist/
+dist/*
+
+# SSL Files
+*.key
+*.crt
 
 # Packages
 *.egg

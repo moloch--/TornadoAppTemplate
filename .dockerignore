@@ -1,0 +1,14 @@
+.git/
+.gitignore
+.gitmodules
+
+docker-compose.yml
+Dockerfile
+
+.pylintrc
+
+README.md
+CONTRIBUTING.md
+
+jsclient
+jsclient/*

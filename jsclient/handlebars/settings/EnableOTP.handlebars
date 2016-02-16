@@ -1,0 +1,29 @@
+<div class="container">
+    <div class="page-header">
+        <h1>
+            <i class="fa fa-fw fa-shield"></i>
+            Enable 2FA/OTP
+        </h1>
+    </div>
+    <div class="row">
+        <div id="alerts" class="col-md-12"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            {{#if otp_enabled}}
+                <p class="text-center">
+                    OTP is already enabled for your account.
+                </p>
+            {{else}}
+                <div class="row">
+                    <div id="otp-enrollment" class="col-md-12 animated">
+                        <button id="confirm-enable-otp" type="button" class="btn btn-info">
+                            <i class="fa fa-fw fa-shield"></i>
+                            Enable 2FA for {{name}}
+                        </button>
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+    </div>
+</div>

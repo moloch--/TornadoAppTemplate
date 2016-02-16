@@ -1,0 +1,24 @@
+<div class="row">
+    <div class="col-md-6">
+        <img src="{{qrcode}}" class="img-thumbnail" />
+        <br />
+        <br />
+        <pre>{{uri}}</pre>
+    </div>
+    <div class="col-md-6">
+        <form>
+            <div class="form-group">
+                <label for="otp-code">
+                    Test Code
+                </label>
+                <input id="otp-code" type="text" class="form-control" placeholder="OTP Code" autocomplete="off">
+            </div>
+            <button id="test-otp-code" type="submit" class="btn btn-default">
+                Submit
+            </button>
+        </form>
+        <br />
+        <br />
+        <div id="otp-alerts"></div>
+    </div>
+</div>

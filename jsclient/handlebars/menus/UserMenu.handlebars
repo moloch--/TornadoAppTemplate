@@ -1,0 +1,56 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#home">
+                {{#if this.debug}}
+                    <i class="fa fa-fw fa-bug"></i>
+                    DEBUG
+                {{else}}
+                    <i class="fa fa-fw fa-eye"></i>
+                    App
+                {{/if}}
+            </a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+
+                <li>
+                    <a href="#home">
+                        <i class="fa fa-fw fa-home"></i>
+                    </a>
+                </li>
+
+            </ul>
+            <!-- Right Hand Menu -->
+            <ul id="top-menu-rightnav" class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                       <i class="fa fa-fw fa-user"></i>
+                       {{ username }}
+                       <i class="fa fa-fw fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#settings">
+                                <i class="fa fa-fw fa-cogs"></i>
+                                Settings
+                            </a>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        <li>
+                            <a href="#logout">
+                                <i class="fa fa-fw fa-sign-out"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</div>

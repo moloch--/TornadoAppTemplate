@@ -1,85 +1,105 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 @author: moloch
+Copyright 2015
+"""
 
-    Copyright 2013
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-'''
-
-import logging
+import cStringIO
 import functools
+import logging
+import traceback
 
-from models.User import User
+from tornado.options import options
+
+from libs.JsonAPI import NOT_AUTHENTICATED, NOT_AUTHORIZED
 
 
-def csp(src, policy):
-    ''' Decorator for easy CSP management '''
+def dangerous(method):
+    """
+    This is a decorator which can be used to mark functions
+    as dangerous. It will result in a warning being emitted
+    when the function is used.
+    """
 
-    def func(method):
-        @functools.wraps(method)
-        def wrapper(self, *args, **kwargs):
-            self.add_content_policy(src, policy)
-        return wrapper
-    return func
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        if options.debug:
+            stack = cStringIO.StringIO()
+            traceback.print_stack(limit=3, file=stack)
+            class_name = args[0].__class__ if len(args) else ''
+            logging.warning("[DANGEROUS FUNCTION] `%s.%s`:\n%s",
+                            class_name, method.__name__, stack.getvalue())
+        return method(*args, **kwargs)
+    return wrapper
+
 
 def authenticated(method):
-    ''' Checks to see if a user has been authenticated '''
+    """ Checks to see if a user has been authenticated """
 
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
-        if self.session is not None:
-            if self.session.ip_address == self.request.remote_ip:
+        if self.session is not None and self.session["ip_address"] == self.request.remote_ip:
+            user = self.get_current_user()
+            if user is not None and not user.account_locked:
                 return method(self, *args, **kwargs)
-            else:
-                self.redirect(self.application.settings['login_url'])
-        else:
-            self.redirect(self.application.settings['login_url'])
+        self.set_status(NOT_AUTHENTICATED)
+        self.write({"errors": ["You are not authenticated"]})
     return wrapper
 
 
 def restrict_ip_address(method):
-    ''' Only allows access to ip addresses in a provided list '''
+    """ Only allows access to ip addresses in a provided list """
 
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
-        if self.request.remote_ip in self.application.settings['admin_ips']:
+        if self.request.remote_ip in self.config.admin_ips:
             return method(self, *args, **kwargs)
         else:
-            self.redirect(self.application.settings['forbidden_url'])
+            logging.warning("Rejecting request from non-whitelisted admin ip")
+            self.set_status(NOT_AUTHORIZED)
+            self.write({"errors": ["You are not authorized"]})
     return wrapper
 
 
 def authorized(permission):
-    ''' Checks user's permissions '''
+    """ Checks user's permissions """
 
     def func(method):
-
         @functools.wraps(method)
         def wrapper(self, *args, **kwargs):
             if self.session is not None:
-                user = User.by_id(self.session['user_id'])
+                user = self.get_current_user()
                 if user is not None and user.has_permission(permission):
                     return method(self, *args, **kwargs)
-            self.redirect(self.application.settings['forbidden_url'])
+                else:
+                    logging.warning("Rejecting unauthorized request from '%s'",
+                                    user.name)
+            self.set_status(NOT_AUTHORIZED)
+            self.write({"errors": ["You are not authorized"]})
         return wrapper
     return func
 
-def restrict_origin(method):
-    ''' Check the origin header / prevent CSRF+WebSocket '''
 
-    @functools.wraps(method)
-    def wrapper(self, *args, **kwargs):
-        if self.request.headers['Origin'] == self.config.origin:
-            return method(self, *args, **kwargs)
-    return wrapper
+def authentication_type(auth_type):
+    """
+    Check if the current session was created using an appropriate
+    authentication type (e.g. "login" or "apikey"), the argument is a whitelist
+    (string or list object) of acceptable authentication types.
+    """
+
+    def func(method):
+        @functools.wraps(method)
+        def wrapper(self, *args, **kwargs):
+            if self.session is not None:
+                if isinstance(auth_type, basestring):
+                    if self.session["authentication"] == auth_type:
+                        return method(self, *args, **kwargs)
+                elif isinstance(auth_type, list):
+                    if self.session["authentication"] in auth_type:
+                        return method(self, *args, **kwargs)
+            self.set_status(NOT_AUTHORIZED)
+            self.write({"errors": [
+                "This session is authorized to call this method"
+            ]})
+        return wrapper
+    return func

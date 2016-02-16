@@ -1,0 +1,42 @@
+#
+# This is a Docker Compose file for a DEV/DEBUG setup
+# > DO NOT USE THIS IN PRODUCTION IT IS VERY INSECURE
+#
+
+sql:
+  image: postgres:latest
+  environment:
+    - POSTGRES_DB=app
+    - POSTGRES_USER=app
+    - POSTGRES_PASSWORD=badpassword
+  ports:
+    - "5432:5432"
+
+api:
+  build: .
+  environment:
+    - APP_APP=1
+    - APP_LISTEN_PORT=8888
+    - APP_DEBUG=1
+    - APP_SETUP=devel
+    - APP_ORIGIN=ws://foo.bar
+    - APP_COOKIE_SECRET=randomstring
+    - APP_SESSION_SECRET=stringrandom
+    - APP_DELAY_START=1
+  volumes:
+    - ./setup/alembic/versions:/opt/app/setup/alembic/versions:rw
+  expose:
+    - "8888"
+  links:
+    - sql
+
+web:
+  build: ./jsclient
+# Uncomment these to map the container's root to your local /jsclient
+#  volumes:
+#    - ./jsclient:/var/www:rw
+  ports:
+    - "80:80"
+    - "443:443"
+  links:
+    - api

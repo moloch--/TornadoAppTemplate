@@ -1,0 +1,31 @@
+{
+  "name": "app",
+  "description": "Torando App Template",
+  "main": "app.min.js",
+  "authors": [
+    "moloch <moloch38@gmail.com>"
+  ],
+  "license": "",
+  "moduleType": [
+    "es6"
+  ],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "handlebars": "~4.0.5",
+    "underscore": "~1.8.3",
+    "backbone": "~1.2.3",
+    "animate.css": "animate-css#^3.5.1",
+    "bootswatch": "~3.3.6",
+    "font-awesome": "fontawesome#^4.5.0",
+    "datatables.net-bs": "^1.10.11"
+  }
+}

@@ -1,0 +1,23 @@
+{
+    "env": {
+        "browser": true
+    },
+
+    "globals": {
+        "$": true,
+        "_": true,
+        "App": true,
+        "Backbone": true,
+        "Handlebars": true,
+        "module": true,
+        "require": true
+    },
+
+    "rules": {
+        "no-new": 0,
+        "no-console": 0,
+        "no-underscore-dangle": 0,
+        "global-strict": 0,
+        "new-cap": 0
+    }
+}

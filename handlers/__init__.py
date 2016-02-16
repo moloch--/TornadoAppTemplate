@@ -1,110 +1,63 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 @author: moloch
-
-    Copyright 2013
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-'''
-
+Copyright 2015
+"""
 
 import logging
 
-from os import urandom
-from tornado import netutil
-from tornado.web import Application, StaticFileHandler
+from hashlib import sha512
+from tornado.options import options
+from tornado.web import Application
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
-from uimodules.Menu import Menu
-from libs.ConfigManager import ConfigManager
-from handlers.PublicHandlers import *
-from handlers.ErrorHandlers import *
-from handlers.AdminHandlers import *
-from handlers.UserHandlers import *
 
-### Config
-config = ConfigManager.instance()
-
-### Application setup
-app = Application([
-
-    # Static Handlers - Serves static CSS, JS and images
-    (r'/static/(.*\.(css|js|png|jpg|jpeg|svg|ttf))',
-        StaticFileHandler, {'path': 'static/'}),
-
-    # User Handlers -
-    (r'/user', UserHomeHandler),
-
-    # Admin Handlers -
-
-    # Error Handlers -
-    (r'/403', ForbiddenHandler),
-
-    # Public Handlers -
-    (r'/login', LoginHandler),
-    (r'/', LoginHandler),
-
-    # Catch all 404 page
-    (r'(.*)', NotFoundHandler),
-
-],
-
-    # Randomly generated secret key
-    cookie_secret=urandom(32).encode('hex'),
-
-    # Request that does not pass @authorized will be
-    # redirected here
-    forbidden_url='/403',
-
-    # Requests that does not pass @authenticated  will be
-    # redirected here
-    login_url='/login',
-
-    # Template directory
-    template_path='templates/',
-
-    # UI Modules
-    ui_modules={
-        "menu": Menu,
-    },
-
-    # Enable XSRF forms
-    xsrf_cookies=True,
-
-    # Debug mode
-    debug=config.debug,
-)
+# Handlers
+from .AuthenticationHandlers import LoginAuthenticationAPIHandler
+from .ErrorHandlers import NotFoundHandler
+from .UserHandlers import MeAPIHandler, OTPEnrollmentAPIHandler
+from .UserHandlers import ManageUsersAPIHandler
 
 
-def start_server():
-    ''' Main entry point for the application '''
-    sockets = netutil.bind_sockets(config.listen_port)
-    if config.use_ssl:
-        server = HTTPServer(app,
-            ssl_options={
-                "certfile": config.certfile,
-                "keyfile": config.keyfile,
-            },
-            xheaders=config.x_headers)
-    else:
-        server = HTTPServer(app, xheaders=config.x_headers)
-    server.add_sockets(sockets)
+# Hash the secrets, for the hell of it
+COOKIE_SECRET = sha512(options.cookie_secret).hexdigest()
+SESSION_SECRET = sha512(options.session_secret).hexdigest()
+
+# URL Prefixes
+API_V1 = "/api/v1"
+
+# App application handlers
+APP_HANDLERS = [
+
+
+    # Authentication Handlers
+    (API_V1 + r"/session", LoginAuthenticationAPIHandler),
+
+    # Settings
+    (r'/api/me(.*)', MeAPIHandler),
+    (r'/api/otp/enrollment', OTPEnrollmentAPIHandler),
+    (r'/api/user', ManageUsersAPIHandler),
+    (r'/api/user/(.*)', ManageUsersAPIHandler),
+]
+
+# Wildcard handler is always at the end
+APP_HANDLERS.append((r'(.*)', NotFoundHandler))
+
+
+def start_app_server():
+    """ Main entry point for the application """
+    app_app = Application(
+        handlers=APP_HANDLERS,
+        cookie_secret=COOKIE_SECRET,
+        session_secret=SESSION_SECRET,
+        autoreload=False,
+        xsrf_cookies=False)
+    app_server = HTTPServer(app_app, xheaders=options.x_headers)
+    app_server.listen(options.listen_port)
     io_loop = IOLoop.instance()
     try:
         io_loop.start()
     except KeyboardInterrupt:
         logging.warn("Keyboard interrupt, shutdown everything!")
-    except:
-        logging.exception("Main I/O Loop threw an excetion!")
     finally:
         io_loop.stop()

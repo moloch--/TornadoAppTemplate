@@ -1,0 +1,66 @@
+<div class="container">
+    <div class="page-header">
+        <h1>
+            <i class="fa fa-fw fa-gears"></i>
+            {{name}}
+            <small>Settings</small>
+        </h1>
+    </div>
+    <div class="row">
+        <div id="alerts" class="col-md-12"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form>
+                <div class="form-group">
+                    <label for="me-new-password">
+                        Change Password
+                    </label>
+                    <input type="password" class="form-control" id="me-new-password1" placeholder="Password" />
+                </div>
+                <div class="form-group">
+                    <label for="me-current-password">
+                        Confirm New Password
+                    </label>
+                    <input type="password" class="form-control" id="me-new-password2" placeholder="Password" />
+                </div>
+                <div class="form-group">
+                    <label for="me-current-password">
+                        Current Password
+                    </label>
+                    <input type="password" class="form-control" id="me-current-password" placeholder="Password" />
+                </div>
+                <br />
+                <div class="form-group">
+                    <label for="me-email-address">
+                        Email Address
+                    </label>
+                    <input type="email" class="form-control" id="me-email-address" placeholder="Email Address" value="{{email_address}}" />
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input id="me-email-updates" type="checkbox" {{#if email_updates}}checked{{/if}}>
+                        <i class="fa fa-fw fa-paper-plane-o"></i>
+                        Enable Email Updates
+                    </label>
+                </div>
+                <hr />
+                <button id="save-settings" type="button" class="btn btn-primary">
+                    <i class="fa fa-fw fa-save"></i>
+                    Save Settings
+                </button>
+                {{#if otp_enabled}}
+                    <button id="show-disable-otp" type="button" class="btn btn-danger">
+                        <i class="fa fa-fw fa-unlock-alt"></i>
+                        Disable 2FA
+                    </button>
+                {{else}}
+                    <button id="show-enable-otp" type="button" class="btn btn-info">
+                        <i class="fa fa-fw fa-shield"></i>
+                        Enable 2FA
+                    </button>
+                {{/if}}
+            </form>
+        </div>
+    </div>
+</div>

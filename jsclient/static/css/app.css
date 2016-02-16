@@ -1,0 +1,66 @@
+@font-face {
+    font-family: "source-code-pro-black";
+    src: url("/fonts/source-code-pro/SourceCodePro-Black.otf.woff") format('woff');
+}
+
+
+@font-face {
+    font-family: "source-code-pro-bold";
+    src: url("/fonts/source-code-pro/SourceCodePro-Bold.otf.woff") format('woff');
+}
+
+@font-face {
+    font-family: "source-code-extra-light";
+    src: url("/fonts/source-code-pro/SourceCodePro-ExtraLight.otf.woff") format('woff');
+}
+
+@font-face {
+    font-family: "source-code-pro-light";
+    src: url("/fonts/source-code-pro/SourceCodePro-Light.otf.woff") format('woff');
+}
+
+@font-face {
+    font-family: "source-code-pro-medium";
+    src: url("/fonts/source-code-pro/SourceCodePro-Medium.otf.woff") format('woff');
+}
+
+@font-face {
+    font-family: "source-code-pro";
+    src: url("/fonts/source-code-pro/SourceCodePro-Regular.otf.woff") format('woff');
+}
+
+@font-face {
+    font-family: "source-code-pro-semibold";
+    src: url("/fonts/source-code-pro/SourceCodePro-Semibold.otf.woff") format('woff');
+}
+
+.monospace {
+    font-family: "source-code-pro"
+}
+
+.monospace-light {
+    font-family: "source-code-pro-light"
+}
+
+body {
+    padding-top: 50px;
+    padding-bottom: 40px;
+}
+
+
+/*
+ * Main content
+ */
+
+.main {
+  padding: 20px;
+}
+@media (min-width: 768px) {
+  .main {
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+}
+.main .page-header {
+  margin-top: 0;
+}
