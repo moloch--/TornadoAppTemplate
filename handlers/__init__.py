@@ -34,10 +34,10 @@ APP_HANDLERS = [
     (API_V1 + r"/session", LoginAuthenticationAPIHandler),
 
     # Settings
-    (r'/api/me(.*)', MeAPIHandler),
-    (r'/api/otp/enrollment', OTPEnrollmentAPIHandler),
-    (r'/api/user', ManageUsersAPIHandler),
-    (r'/api/user/(.*)', ManageUsersAPIHandler),
+    (API_V1 + r"/me(.*)", MeAPIHandler),
+    (API_V1 + r"/otp/enrollment", OTPEnrollmentAPIHandler),
+    (API_V1 + r"/user", ManageUsersAPIHandler),
+    (API_V1 + r"/user/(.*)", ManageUsersAPIHandler),
 ]
 
 # Wildcard handler is always at the end
